@@ -140,7 +140,7 @@ namespace _2048
                 }
             }
         }
-        //Mouvement et fusion fleche du haut
+        //Mouvement fleche du haut
         static void MouvementHaut()
         {
             int size = table.GetLength(0);
@@ -161,18 +161,11 @@ namespace _2048
                             table[row, y] = 0;
                             row--;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row > 0 && table[row - 1, y] == table[row, y])
-                        {
-                            table[row - 1, y] *= 2;
-                            table[row, y] = 0;
-                        }
                     }
                 }
             }
         }
-        //Mouvement et fusion fleche du bas
+        //Mouvement fleche du bas
         static void MouvementBas()
         {
             int size = table.GetLength(0);
@@ -192,18 +185,11 @@ namespace _2048
                             table[row, y] = 0;
                             row++;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row < size - 1 && table[row + 1, y] == table[row, y])
-                        {
-                            table[row + 1, y] *= 2;
-                            table[row, y] = 0;
-                        }
                     }
                 }
             }
         }
-        //Mouvement et fusion fleche de gauche
+        //Mouvement fleche de gauche
         static void MouvementGauche()
         {
             int size = table.GetLength(0);
@@ -223,19 +209,12 @@ namespace _2048
                             table[x, col] = 0;
                             col--;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (col > 0 && table[x, col - 1] == table[x, col])
-                        {
-                            table[x, col - 1] *= 2;
-                            table[x, col] = 0;
-                        }
                     }
                 }
             }
         }
         //test
-        //Mouvement et fusion fleche de droite
+        //Mouvement fleche de droite
         static void MouvementDroite()
         {
             int size = table.GetLength(0);
@@ -254,13 +233,6 @@ namespace _2048
                             table[x, col + 1] = table[x, col];
                             table[x, col] = 0;
                             col++;
-                        }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (col < size - 1 && table[x, col + 1] == table[x, col])
-                        {
-                            table[x, col + 1] *= 2;
-                            table[x, col] = 0;
                         }
                     }
                 }
