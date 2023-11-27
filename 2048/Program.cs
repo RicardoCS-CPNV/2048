@@ -17,6 +17,7 @@ namespace _2048
         static int[,] table = new int[4, 4];
         static void AfficheTableau()
         {
+            Console.WriteLine("Score : " + score);
             //Affiche le nom du jeu
             Console.WriteLine("####### 2048 GAME #######\n");
             //Affiche le tableau
@@ -167,6 +168,7 @@ namespace _2048
                         {
                             table[row - 1, y] *= 2;
                             table[row, y] = 0;
+                            score += table[row - 1, y];
                         }
                     }
                 }
@@ -198,6 +200,7 @@ namespace _2048
                         {
                             table[row + 1, y] *= 2;
                             table[row, y] = 0;
+                            score += table[row + 1, y];
                         }
                     }
                 }
@@ -229,6 +232,7 @@ namespace _2048
                         {
                             table[x, col - 1] *= 2;
                             table[x, col] = 0;
+                            score += table[x, col - 1];
                         }
                     }
                 }
@@ -261,10 +265,13 @@ namespace _2048
                         {
                             table[x, col + 1] *= 2;
                             table[x, col] = 0;
+                            score += table[x, col + 1];
                         }
+                        
                     }
                 }
             }
         }
+        static int score = 0;
     }
 }
