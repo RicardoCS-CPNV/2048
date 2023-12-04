@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,11 +15,11 @@ namespace _2048
             NombreAleatoire();
             AfficheTabAle();
             DetectionFleche();
+            Victoire();
         }
         static int[,] table = new int[4, 4];
         static void AfficheTableau()
         {
-            Console.WriteLine("Score : " + score);
             //Affiche le nom du jeu
             Console.WriteLine("####### 2048 GAME #######\n");
             //Affiche le tableau
@@ -29,6 +31,7 @@ namespace _2048
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine("\nScore : " + score);
         }
         //Regarde si la valeur est de 0
         static bool checkValues()
@@ -107,11 +110,15 @@ namespace _2048
                     //Flêche du haut
                     case ConsoleKey.UpArrow:
                         MouvementHaut();
+                        FusionHaut();
+                        MouvementHaut();
                         AfficheTabAle();
                         break;
 
                     //Flêche du bas
                     case ConsoleKey.DownArrow:
+                        MouvementBas();
+                        FusionBas();
                         MouvementBas();
                         AfficheTabAle();
                         break;
@@ -119,11 +126,15 @@ namespace _2048
                     //Flêche de gauche
                     case ConsoleKey.LeftArrow:
                         MouvementGauche();
+                        FusionGauche();
+                        MouvementGauche();
                         AfficheTabAle();
                         break;
 
                     //Flêche de droite
                     case ConsoleKey.RightArrow:
+                        MouvementDroite();
+                        FusionDroite();
                         MouvementDroite();
                         AfficheTabAle();
                         break;
@@ -141,7 +152,7 @@ namespace _2048
                 }
             }
         }
-        //Mouvement et fusion fleche du haut
+        //Mouvement fleche du haut
         static void MouvementHaut()
         {
             int size = table.GetLength(0);
@@ -162,19 +173,12 @@ namespace _2048
                             table[row, y] = 0;
                             row--;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row > 0 && table[row - 1, y] == table[row, y])
-                        {
-                            table[row - 1, y] *= 2;
-                            table[row, y] = 0;
-                            score += table[row - 1, y];
-                        }
                     }
                 }
             }
         }
-        //Mouvement et fusion fleche du bas
+
+        //Mouvement fleche du bas
         static void MouvementBas()
         {
             int size = table.GetLength(0);
@@ -194,19 +198,12 @@ namespace _2048
                             table[row, y] = 0;
                             row++;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row < size - 1 && table[row + 1, y] == table[row, y])
-                        {
-                            table[row + 1, y] *= 2;
-                            table[row, y] = 0;
-                            score += table[row + 1, y];
-                        }
                     }
                 }
             }
         }
-        //Mouvement et fusion fleche de gauche
+
+        //Mouvement fleche de gauche
         static void MouvementGauche()
         {
             int size = table.GetLength(0);
@@ -226,20 +223,12 @@ namespace _2048
                             table[x, col] = 0;
                             col--;
                         }
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (col > 0 && table[x, col - 1] == table[x, col])
-                        {
-                            table[x, col - 1] *= 2;
-                            table[x, col] = 0;
-                            score += table[x, col - 1];
-                        }
                     }
                 }
             }
         }
-        //test
-        //Mouvement et fusion fleche de droite
+
+        //Mouvement fleche de droite
         static void MouvementDroite()
         {
             int size = table.GetLength(0);
@@ -259,6 +248,101 @@ namespace _2048
                             table[x, col] = 0;
                             col++;
                         }
+                    }
+                }
+            }
+        }
+
+        //Fusion des tuiles vers le haut
+        static void FusionHaut()
+        {
+            int size = table.GetLength(0);
+
+            //Parcourir chaque colonne de gauche à droite
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 1; x < size; x++)
+                {
+                    if (table[x, y] != 0)
+                    {
+                        int row = x;
+
+                        //Fusionne les tuiles si elles ont la même valeur
+                        if (row > 0 && table[row - 1, y] == table[row, y])
+                        {
+                            table[row - 1, y] *= 2;
+                            table[row, y] = 0;
+                            score += table[row - 1, y];
+                        }  
+                    }
+                }
+            }
+        }
+
+        //Fusion des tuiles vers le bas
+        static void FusionBas()
+        {
+            int size = table.GetLength(0);
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = size - 2; x >= 0; x--)
+                {
+                    if (table[x, y] != 0)
+                    {
+                        int row = x;
+                        
+                        //Fusionne les tuiles si elles ont la même valeur
+                        if (row < size - 1 && table[row + 1, y] == table[row, y])
+                        {
+                            table[row + 1, y] *= 2;
+                            table[row, y] = 0;
+                            score += table[row + 1, y];
+                        }
+                    }
+                }
+            }
+
+        }
+
+        //Fusion des tuiles vers la gauche
+        static void FusionGauche()
+        {
+            int size = table.GetLength(0);
+
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 1; y < size; y++)
+                {
+                    if (table[x, y] != 0)
+                    {
+                        int col = y;
+
+                        //Fusionne les tuiles si elles ont la même valeur
+                        if (col > 0 && table[x, col - 1] == table[x, col])
+                        {
+                            table[x, col - 1] *= 2;
+                            table[x, col] = 0;
+                            score += table[x, col - 1];
+                        }
+                    }
+                }
+            }
+
+        }
+
+        //Fusion des tuiles vers la droite
+        static void FusionDroite()
+        {
+            int size = table.GetLength(0);
+
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = size - 2; y >= 0; y--)
+                {
+                    if (table[x, y] != 0)
+                    {
+                        int col = y;
 
                         //Fusionne les tuiles si elles ont la même valeur
                         if (col < size - 1 && table[x, col + 1] == table[x, col])
@@ -266,12 +350,35 @@ namespace _2048
                             table[x, col + 1] *= 2;
                             table[x, col] = 0;
                             score += table[x, col + 1];
+
                         }
-                        
                     }
                 }
             }
+
         }
+
+        //Incrémentation du score
         static int score = 0;
+
+        //Gerer la victoire
+        static void Victoire()
+        {
+            Console.WriteLine("saluuuuuut");
+
+            int size = table.GetLength(0);
+
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    if (table[x, y] == 2048)
+                    {
+                        Console.WriteLine("Tu as gagné, Bravo !!!\nTu peux continuer à jouer.");
+                    }
+                }
+            }
+
+        }
     }
 }
