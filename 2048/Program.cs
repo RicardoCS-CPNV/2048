@@ -16,12 +16,37 @@ namespace _2048
             AfficheTable();
             DetectionFleche();
             Victoire();
+
+            /*if (CheckForWin())
+            {
+                Console.WriteLine("Félicitations ! Vous avez atteint 2048 !");
+            }*/
+
         }
         static int[,] table = new int[4, 4];
+
+        static bool CheckForWin()
+        {
+            // Parcourir le plateau pour vérifier si une tuile de valeur 2048 est présente
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    if (table[x, y] == 2048)
+                    {
+                        return true; // La victoire est atteinte
+                    }
+                }
+            }
+
+            return false; // Aucune tuile de valeur 2048 trouvée
+        }
+
         static void AfficheTableau()
         {
             //Affiche le nom du jeu
             Console.WriteLine("####### 2048 GAME #######\n");
+
             //Affiche le tableau
             for (int row = 0; row < 4; row++)
             {
@@ -29,7 +54,17 @@ namespace _2048
 
                 for (int col = 0; col < 4; col++)
                 {
+                    // Choisir une couleur en fonction de la valeur
+                    ConsoleColor color = CouleurTuiles(table[row, col]);
+
+                    //Changer la couleur de la case
+                    Console.ForegroundColor = color;
+
+                    // Afficher la valeur de la case
                     Console.Write(table[row, col] + "\t");
+
+                    //Rétablir la couleur par défaut
+                    Console.ResetColor();
                 }
                 Console.WriteLine();
             }
@@ -362,6 +397,38 @@ namespace _2048
 
         //Incrémentation du score
         static int score = 0;
+
+        //Mettre des couleurs par nombre
+        static ConsoleColor CouleurTuiles(int value)
+        {
+            switch (value)
+            {
+                case 2:
+                    return ConsoleColor.Red;
+                case 4:
+                    return ConsoleColor.Blue;
+                case 8:
+                    return ConsoleColor.Yellow;
+                case 16:
+                    return ConsoleColor.Green;
+                case 32:
+                    return ConsoleColor.Cyan;
+                case 64:
+                    return ConsoleColor.Magenta;
+                case 128:
+                    return ConsoleColor.DarkRed;
+                case 256:
+                    return ConsoleColor.DarkBlue;
+                case 512:
+                    return ConsoleColor.DarkYellow;
+                case 1024:
+                    return ConsoleColor.DarkGreen;
+                case 2048:
+                    return ConsoleColor.DarkCyan;
+                default:
+                    return ConsoleColor.White; // Couleur par défaut
+            }
+        }
 
         //Gerer la victoire
         static void Victoire()
