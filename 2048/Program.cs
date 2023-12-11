@@ -13,7 +13,7 @@ namespace _2048
         static void Main(string[] args)
         {
             NombreAleatoire();
-            AfficheTabAle();
+            AfficheTable();
             DetectionFleche();
             Victoire();
         }
@@ -25,6 +25,8 @@ namespace _2048
             //Affiche le tableau
             for (int row = 0; row < 4; row++)
             {
+                Console.WriteLine();
+
                 for (int col = 0; col < 4; col++)
                 {
                     Console.Write(table[row, col] + "\t");
@@ -70,7 +72,7 @@ namespace _2048
             table[randomLine, randomLine2] = randomNumber2;
         }
         //affiche le tableau ainsi que les nombres aléatoire
-        static void AfficheTabAle()
+        static void AfficheTable()
         {
             //Clear la Console pour ne pas que l'affichage se repete
             Console.Clear();
@@ -112,7 +114,7 @@ namespace _2048
                         MouvementHaut();
                         FusionHaut();
                         MouvementHaut();
-                        AfficheTabAle();
+                        AfficheTable();
                         break;
 
                     //Flêche du bas
@@ -120,7 +122,7 @@ namespace _2048
                         MouvementBas();
                         FusionBas();
                         MouvementBas();
-                        AfficheTabAle();
+                        AfficheTable();
                         break;
 
                     //Flêche de gauche
@@ -128,7 +130,7 @@ namespace _2048
                         MouvementGauche();
                         FusionGauche();
                         MouvementGauche();
-                        AfficheTabAle();
+                        AfficheTable();
                         break;
 
                     //Flêche de droite
@@ -136,7 +138,7 @@ namespace _2048
                         MouvementDroite();
                         FusionDroite();
                         MouvementDroite();
-                        AfficheTabAle();
+                        AfficheTable();
                         break;
 
                     //C quitte le programme
@@ -364,8 +366,6 @@ namespace _2048
         //Gerer la victoire
         static void Victoire()
         {
-            Console.WriteLine("saluuuuuut");
-
             int size = table.GetLength(0);
 
             for (int x = 0; x < size; x++)
@@ -378,7 +378,6 @@ namespace _2048
                     }
                 }
             }
-
         }
     }
 }
