@@ -130,6 +130,7 @@ namespace _2048
                 }
             }
 
+            //Gerer la victoire
             if (Index >= 1)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -343,6 +344,7 @@ namespace _2048
                             table[row, y] = 0;
                             score += table[row - 1, y];
 
+                            //Gère une partie de la victoire
                             if (table[row - 1, y] == 2048)
                             {
                                 Index += 1;
@@ -373,6 +375,7 @@ namespace _2048
                             table[row, y] = 0;
                             score += table[row + 1, y];
 
+                            //Gère une partie de la victoire
                             if (table[row + 1, y] == 2048)
                             {
                                 Index += 1;
@@ -404,6 +407,7 @@ namespace _2048
                             table[x, col] = 0;
                             score += table[x, col - 1];
 
+                            //Gère une partie de la victoire
                             if (table[x, col - y] == 2048)
                             {
                                 Index += 1;
@@ -435,6 +439,7 @@ namespace _2048
                             table[x, col] = 0;
                             score += table[x, col + 1];
 
+                            //Gère une partie de la victoire
                             if (table[x, col + 1] == 2048)
                             {
                                 Index += 1;
