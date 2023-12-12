@@ -15,15 +15,10 @@ namespace _2048
             NombreAleatoire();
             AfficheTable();
             DetectionFleche();
-            Victoire();
-
-            /*if (CheckForWin())
-            {
-                Console.WriteLine("Félicitations ! Vous avez atteint 2048 !");
-            }*/
-
         }
         static int[,] table = new int[4, 4];
+
+        static int Index = 0;
 
         static bool CheckForWin()
         {
@@ -93,7 +88,7 @@ namespace _2048
             int randomLine2 = random.Next(0, 4);
 
             //Nombre aléatoire qui s'affichera dans la console de 0 à 9
-            int randomNumber2 = (random.Next(10) == 0) ? 4 : 2;
+            int randomNumber2 = (random.Next(10) == 0) ? 4 : 1024;
 
             do
             {
@@ -111,6 +106,7 @@ namespace _2048
         {
             //Clear la Console pour ne pas que l'affichage se repete
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
 
             //Si la tuile random est 0 alors il ajoute un 2 ou un 4
             if (checkValues())
@@ -128,6 +124,12 @@ namespace _2048
                 Console.WriteLine("\nYou failed !\nPress C to leave.");
             }
 
+            if (Index >= 1)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\nTu as gagné, tu peux continuer à jouer !!!");
+                Index += 1;
+            }
         }
         //Detecte la flêche selectionnée et quitte si l'utilisateur tape C
         static void DetectionFleche()
@@ -310,6 +312,11 @@ namespace _2048
                             table[row - 1, y] *= 2;
                             table[row, y] = 0;
                             score += table[row - 1, y];
+
+                            if (table[row - 1, y] == 2048)
+                            {
+                                Index += 1;
+                            }
                         }  
                     }
                 }
@@ -335,6 +342,11 @@ namespace _2048
                             table[row + 1, y] *= 2;
                             table[row, y] = 0;
                             score += table[row + 1, y];
+
+                            if (table[row + 1, y] == 2048)
+                            {
+                                Index += 1;
+                            }
                         }
                     }
                 }
@@ -361,6 +373,11 @@ namespace _2048
                             table[x, col - 1] *= 2;
                             table[x, col] = 0;
                             score += table[x, col - 1];
+
+                            if (table[x, col - y] == 2048)
+                            {
+                                Index += 1;
+                            }
                         }
                     }
                 }
@@ -388,6 +405,10 @@ namespace _2048
                             table[x, col] = 0;
                             score += table[x, col + 1];
 
+                            if (table[x, col + 1] == 2048)
+                            {
+                                Index += 1;
+                            }
                         }
                     }
                 }
@@ -403,6 +424,8 @@ namespace _2048
         {
             switch (value)
             {
+                case 0:
+                    return ConsoleColor.DarkGray;
                 case 2:
                     return ConsoleColor.Red;
                 case 4:
@@ -427,23 +450,6 @@ namespace _2048
                     return ConsoleColor.DarkCyan;
                 default:
                     return ConsoleColor.White; // Couleur par défaut
-            }
-        }
-
-        //Gerer la victoire
-        static void Victoire()
-        {
-            int size = table.GetLength(0);
-
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    if (table[x, y] == 2048)
-                    {
-                        Console.WriteLine("Tu as gagné, Bravo !!!\nTu peux continuer à jouer.");
-                    }
-                }
             }
         }
     }
