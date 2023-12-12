@@ -120,8 +120,14 @@ namespace _2048
             {
                 //Affiche le tableau
                 AfficheTableau();
-                //Affiche un message quand la personne perd
-                Console.WriteLine("\nYou failed !\nPress C to leave.");
+
+                if (Defaite() == false)
+                {
+                    //Affiche le tableau
+                    AfficheTableau();
+                    //Affiche un message quand la personne perd
+                    Console.WriteLine("\nFin de la partie.\n\nTape C pour quitter.");
+                }
             }
 
             if (Index >= 1)
@@ -130,7 +136,31 @@ namespace _2048
                 Console.WriteLine("\nTu as gagné, tu peux continuer à jouer !!!");
                 Index += 1;
             }
+
         }
+
+        //Gère la défaite
+        static bool Defaite()
+        {
+            bool defaite = true;
+
+            for (int i = 1; i < 4; i++)
+            {
+                for (int j = 1; j < 4; j++)
+                {
+                    if ((i - 1 >= 0 && table[i, j] == table[i - 1, j]) ||
+                        (i + 1 <= 3 && table[i, j] == table[i + 1, j]) ||
+                        (j - 1 >= 0 && table[i, j] == table[i, j - 1]) ||
+                        (j + 1 <= 3 && table[i, j] == table[i, j + 1]))
+                    {
+                        defaite = false;
+                    }
+                }
+            }
+
+            return defaite;
+        }
+
         //Detecte la flêche selectionnée et quitte si l'utilisateur tape C
         static void DetectionFleche()
         {
