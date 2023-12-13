@@ -85,8 +85,6 @@ namespace _2048
 
                 if (Defaite() == false)
                 {
-                    //Affiche le tableau
-                    AffichageConsole();
                     //Affiche un message quand la personne perd
                     Console.WriteLine("\nFin de la partie.\n\nTape C pour quitter.");
                 }
@@ -128,6 +126,14 @@ namespace _2048
                 ConsoleKey key = keyInfo.Key;
 
                 int[] table1D;
+
+                // Ajout de la vérification de défaite ici
+                if (Defaite())
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\nVous avez perdu. Appuyez sur 'C' pour quitter.");
+                    break;
+                }
 
                 //Fait un mouvement dans le tableau en fonction de la flêche choisi ou quitte le programme
                 switch (key)
@@ -286,23 +292,33 @@ namespace _2048
         //Gère la défaite
         static bool Defaite()
         {
-            bool defaite = true;
-
-            for (int i = 1; i < 4; i++)
+            // Vérifie si toutes les cases sont remplies
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = 1; j < 4; j++)
+                for (int j = 0; j < 4; j++)
+                {
+                    if (table[i, j] == 0)
+                    {
+                        return false; // Il reste des cases vides, la partie continue
+                    }
+                }
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
                 {
                     if ((i - 1 >= 0 && table[i, j] == table[i - 1, j]) ||
                         (i + 1 <= 3 && table[i, j] == table[i + 1, j]) ||
                         (j - 1 >= 0 && table[i, j] == table[i, j - 1]) ||
                         (j + 1 <= 3 && table[i, j] == table[i, j + 1]))
                     {
-                        defaite = false;
+                        return false;
                     }
                 }
             }
 
-            return defaite;
+            return true;
         }
 
         //Mettre des couleurs pour chaque nombre
