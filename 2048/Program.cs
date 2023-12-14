@@ -83,10 +83,33 @@ namespace _2048
                 //Affiche le tableau
                 AffichageConsole();
 
-                if (Defaite() == false)
+                // Ajout de la vérification de défaite ici
+                if (!Defaite())
                 {
-                    //Affiche un message quand la personne perd
-                    Console.WriteLine("\nFin de la partie.\n\nTape C pour quitter.");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\nVous avez perdu. Appuyez sur 'C' pour quitter.");
+
+                    bool pressC = true;
+
+                    while (pressC)
+                    {
+
+                        //Attent que l'utilisateur tape une flêche
+                        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                        ConsoleKey keyC = keyInfo.Key;
+
+                        switch (keyC)
+                        {
+                            //C quitte le programme
+                            case ConsoleKey.C:
+                                pressC = false;
+                                break;
+
+                            //Affiche un message d'erreur et demande d'appuyer sur une flêche
+                            default:
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -113,6 +136,8 @@ namespace _2048
             table[randomLine, randomLine2] = randomNumber2;
         }
 
+        static int[,] tableTest = new int[4, 4];
+
         //Detecte la flêche selectionnée et quitte si l'utilisateur tape C
         static void DetectionFleche()
         {
@@ -127,19 +152,12 @@ namespace _2048
 
                 int[] table1D;
 
-                // Ajout de la vérification de défaite ici
-                if (Defaite())
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\nVous avez perdu. Appuyez sur 'C' pour quitter.");
-                    break;
-                }
-
                 //Fait un mouvement dans le tableau en fonction de la flêche choisi ou quitte le programme
                 switch (key)
                 {
                     //Flêche du haut
                     case ConsoleKey.UpArrow:
+
                         for (int i = 0; i < 4; i++)
                         {
                             table1D = MouvementFusion(table[0, i], table[1, i], table[2, i], table[3, i]);
@@ -148,6 +166,20 @@ namespace _2048
                             table[2, i] = table1D[2];
                             table[3, i] = table1D[3];
                         }
+
+                        //TEST
+                        /*Array.Copy(table, tableTest, table.Length);
+                        for (int i = 0; i < 4; i++)
+                        {
+
+
+                            table1D = MouvementFusion(tableTest[0, i], tableTest[1, i], tableTest[2, i], tableTest[3, i]);
+                            tableTest[0, 0] = table1D[0];
+                            tableTest[1, i] = table1D[1];
+                            tableTest[2, i] = table1D[2];
+                            tableTest[3, i] = table1D[3];
+                        }
+                        ArraysEqual(tableTest, table);*/
                         AfficheTable();
 
                         break;
@@ -304,20 +336,83 @@ namespace _2048
                 }
             }
 
+            int[,] tableTemp = new int[4, 4];
+            Array.Copy(table, tableTemp, table.Length);
+
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if ((i - 1 >= 0 && table[i, j] == table[i - 1, j]) ||
-                        (i + 1 <= 3 && table[i, j] == table[i + 1, j]) ||
-                        (j - 1 >= 0 && table[i, j] == table[i, j - 1]) ||
-                        (j + 1 <= 3 && table[i, j] == table[i, j + 1]))
+                    //Verification vers le haut
+                    if (i - 1 >= 0)
+                    {
+                        tableTemp[i, j] = table[i - 1, j];
+                        tableTemp[i - 1, j] = table[i, j];
+                        if (!ArraysEqual(table, tableTemp))
+                        {
+                            return false; // Un mouvement possible est trouvé, la partie continue
+                        }
+                        // Rétablir la copie temporaire
+                        Array.Copy(table, tableTemp, table.Length);
+                    }
+
+                    //Verification vers le bas
+                    if (i + 1 < 4)
+                    {
+                        tableTemp[i, j] = table[i + 1, j];
+                        tableTemp[i + 1, j] = table[i, j];
+                        if (!ArraysEqual(table, tableTemp))
+                        {
+                            return false; // Un mouvement possible est trouvé, la partie continue
+                        }
+                        // Rétablir la copie temporaire
+                        Array.Copy(table, tableTemp, table.Length);
+                    }
+
+                    //Verification vers le gauche
+                    if (j - 1 >= 0)
+                    {
+                        tableTemp[i, j] = table[i, j - 1];
+                        tableTemp[i, j - 1] = table[i, j];
+                        if (!ArraysEqual(table, tableTemp))
+                        {
+                            return false; // Un mouvement possible est trouvé, la partie continue
+                        }
+                        // Rétablir la copie temporaire
+                        Array.Copy(table, tableTemp, table.Length);
+                    }
+
+                    //Verification vers le droite
+                    if (j + 1 < 4)
+                    {
+                        tableTemp[i, j] = table[i, j + 1];
+                        tableTemp[i, j + 1] = table[i, j];
+                        if (!ArraysEqual(table, tableTemp))
+                        {
+                            return false; // Un mouvement possible est trouvé, la partie continue
+                        }
+                        // Rétablir la copie temporaire
+                        Array.Copy(table, tableTemp, table.Length);
+                    }
+
+                }
+            }
+
+            return true;
+        }
+
+        static bool ArraysEqual(int[,] array1, int[,] array2)
+        {
+            for (int i = 0; i < array1.GetLength(0); i++)
+            {
+                for (int j = 0; j < array1.GetLength(1); j++)
+                {
+                    if (array1[i, j] != array2[i, j])
                     {
                         return false;
                     }
                 }
             }
-
             return true;
         }
 
