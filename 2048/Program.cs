@@ -5,7 +5,11 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-
+/*
+ * Auteur : Ricardo Costa Santos
+ * Date : 16.12.2023
+ * Description : Programme qui execute le jeu 2048 en mode console. 
+ */
 namespace _2048
 {
     internal class Program
@@ -16,8 +20,10 @@ namespace _2048
             NombreAleatoire();
             AffichageConsole();
 
+            //Entre dans une boucle
             while (true)
             {
+                //Tant que les conditions sont remplies, l'utilisateur reste dans la boucle if
                 if (!Defaite)
                 {
                     ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -58,7 +64,7 @@ namespace _2048
                         Console.WriteLine("Veuillez taper une touche valide.");
                     }
                 }
-                else
+                else //L'utilisateur vient de perdre la partie
                 {
                     Console.Clear();
                     AffichageConsole();
@@ -66,7 +72,7 @@ namespace _2048
                     Console.WriteLine("\nVous avez perdu. Appuyez sur 'C' pour quitter.");
                     if (Console.ReadKey(true).Key == ConsoleKey.C)
                     {
-                        return;
+                        return; //Quitte le programme
                     }
                 }
             }
@@ -84,25 +90,20 @@ namespace _2048
         //Affiche le nom du jeu, le tableau et le score
         static void AffichageConsole()
         {
-            //Affiche le nom du jeu
-            Console.WriteLine("####### 2048 GAME #######");
+            Console.WriteLine("####### 2048 GAME #######"); //Affiche le nom du jeu
 
             for (int row = 0; row < table.GetLength(0); row++)
             {
                 Console.WriteLine();
                 for (int col = 0; col < table.GetLength(1); col++)
                 {
-                    // Choisir une couleur en fonction de la valeur
-                    CouleurTuiles(table[row, col]);
-                    //Affiche la valeur de la tuile
-                    Console.Write(table[row, col] + "\t");
-                    //Rétablie la couleur par défaut
-                    Console.ResetColor();
+                    CouleurTuiles(table[row, col]); // Choisir une couleur en fonction de la valeur
+                    Console.Write(table[row, col] + "\t"); //Affiche la valeur de la tuile
+                    Console.ResetColor(); //Rétablie la couleur par défaut
                 }
                 Console.WriteLine();
             }
-            //Affichage du score
-            Console.WriteLine("\nScore : " + score);
+            Console.WriteLine("\nScore : " + score); //Affichage du score
         }
 
         //Créer un nombre aléatoire et selectionne une tuile aléatoire
@@ -133,7 +134,7 @@ namespace _2048
         //Detecte les touches tapées
         static bool DetectionFleche(ConsoleKey key)
         {
-            int[,] tableTest = (int[,])table.Clone(); // Create a copy of the board before the move
+            int[,] tableTest = (int[,])table.Clone(); //Créer une copie du tableau avant de faire le mouvement
 
             switch (key)
             {
@@ -151,7 +152,7 @@ namespace _2048
                     break;
             }
 
-            return ChangementTable(tableTest, table); // Check if the board changed after the move
+            return ChangementTable(tableTest, table); //Verifie si le tableau a été modifié après le mouvement
         }
 
         //Regarde si la valeur est de 0
@@ -421,31 +422,44 @@ namespace _2048
             switch (value)
             {
                 case 0: 
-                    Console.ForegroundColor = ConsoleColor.DarkGray; break;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
                 case 2: 
-                    Console.ForegroundColor = ConsoleColor.Red; break;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
                 case 4: 
-                    Console.ForegroundColor = ConsoleColor.Blue; break;
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
                 case 8: 
-                    Console.ForegroundColor = ConsoleColor.Yellow; break;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
                 case 16: 
-                    Console.ForegroundColor = ConsoleColor.Green; break;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
                 case 32: 
-                    Console.ForegroundColor = ConsoleColor.Cyan; break;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
                 case 64: 
-                    Console.ForegroundColor = ConsoleColor.Magenta; break;
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    break;
                 case 128: 
-                    Console.ForegroundColor = ConsoleColor.DarkRed; break;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    break;
                 case 256: 
-                    Console.ForegroundColor = ConsoleColor.DarkBlue; break;
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    break;
                 case 512: 
-                    Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    break;
                 case 1024: 
-                    Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    break;
                 case 2048: 
-                    Console.ForegroundColor = ConsoleColor.DarkGray; break;
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    break;
                 default: 
-                    Console.ForegroundColor = ConsoleColor.White; break; // Couleur par défaut
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break; // Couleur par défaut
             }
         }
     }
