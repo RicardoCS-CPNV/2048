@@ -13,478 +13,439 @@ namespace _2048
         static void Main(string[] args)
         {
             NombreAleatoire();
-            AfficheTable();
-            DetectionFleche();
-        }
-        static int[,] table = new int[4, 4];
+            NombreAleatoire();
+            AffichageConsole();
 
-        static int Index = 0;
-
-        static bool CheckForWin()
-        {
-            // Parcourir le plateau pour vérifier si une tuile de valeur 2048 est présente
-            for (int x = 0; x < 4; x++)
+            while (true)
             {
-                for (int y = 0; y < 4; y++)
+                if (!Defaite)
                 {
-                    if (table[x, y] == 2048)
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.LeftArrow ||
+                        keyInfo.Key == ConsoleKey.UpArrow ||
+                        keyInfo.Key == ConsoleKey.RightArrow ||
+                        keyInfo.Key == ConsoleKey.DownArrow)
                     {
-                        return true; // La victoire est atteinte
+                        bool tableChange = DetectionFleche(keyInfo.Key);
+                        if (tableChange)
+                        {
+                            NombreAleatoire();
+                        }
+                        
+                        Console.Clear();
+                        AffichageConsole();
+
+                        if (Victoire())
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\nTu as gagné, tu peux continuer à jouer !!!");
+                        }
+                        else if (!TableauRempli())
+                        {
+                            Console.Clear();
+                            AffichageConsole();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Game Lost");
+                            Defaite = true;
+                        }
+                    }
+                    else if (keyInfo.Key == ConsoleKey.C)
+                    {
+                        return; //Quitte le programme
+                    }
+                    else
+                    {
+                        Console.WriteLine("Veuillez taper une touche valide.");
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    AffichageConsole();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\nVous avez perdu. Appuyez sur 'C' pour quitter.");
+                    if (Console.ReadKey(true).Key == ConsoleKey.C)
+                    {
+                        return;
                     }
                 }
             }
-
-            return false; // Aucune tuile de valeur 2048 trouvée
         }
 
-        static void AfficheTableau()
+        //Creation du tableau
+        static int[,] table = new int[4, 4];
+
+        //Creation d'un bool pour vérifier si l'utilisateur a perdu
+        static bool Defaite = false;
+
+        //Incrementation du score
+        static int score = 0;
+
+        //Affiche le nom du jeu, le tableau et le score
+        static void AffichageConsole()
         {
             //Affiche le nom du jeu
-            Console.WriteLine("####### 2048 GAME #######\n");
+            Console.WriteLine("####### 2048 GAME #######");
 
-            //Affiche le tableau
-            for (int row = 0; row < 4; row++)
+            for (int row = 0; row < table.GetLength(0); row++)
             {
                 Console.WriteLine();
-
-                for (int col = 0; col < 4; col++)
+                for (int col = 0; col < table.GetLength(1); col++)
                 {
                     // Choisir une couleur en fonction de la valeur
-                    ConsoleColor color = CouleurTuiles(table[row, col]);
-
-                    //Changer la couleur de la case
-                    Console.ForegroundColor = color;
-
-                    // Afficher la valeur de la case
+                    CouleurTuiles(table[row, col]);
+                    //Affiche la valeur de la tuile
                     Console.Write(table[row, col] + "\t");
-
-                    //Rétablir la couleur par défaut
+                    //Rétablie la couleur par défaut
                     Console.ResetColor();
                 }
                 Console.WriteLine();
             }
+            //Affichage du score
             Console.WriteLine("\nScore : " + score);
         }
-        //Regarde si la valeur est de 0
-        static bool checkValues()
+
+        //Créer un nombre aléatoire et selectionne une tuile aléatoire
+        static void NombreAleatoire()
         {
-            //Check si la valeur est 0
-            foreach (int i in table)
+            Random random = new Random();
+            int randomNumber2 = (random.Next(10) == 0) ? 4 : 2;
+
+            if (!AjoutNombrePossible())
             {
-                if (i == 0)
+                return;
+            }
+
+            bool caseVide = false;
+            while (!caseVide)
+            {
+                int randomLine = random.Next(0, 4);
+                int randomLine2 = random.Next(0, 4);
+
+                if (table[randomLine, randomLine2] == 0)
                 {
-                    return true;
+                    table[randomLine, randomLine2] = randomNumber2;
+                    caseVide = true;
+                }
+            }
+        }
+
+        //Detecte les touches tapées
+        static bool DetectionFleche(ConsoleKey key)
+        {
+            int[,] tableTest = (int[,])table.Clone(); // Create a copy of the board before the move
+
+            switch (key)
+            {
+                case ConsoleKey.LeftArrow:
+                    MouvementGauche();
+                    break;
+                case ConsoleKey.UpArrow:
+                    MouvementHaut();
+                    break;
+                case ConsoleKey.RightArrow:
+                    MouvementDroite();
+                    break;
+                case ConsoleKey.DownArrow:
+                    MouvementBas();
+                    break;
+            }
+
+            return ChangementTable(tableTest, table); // Check if the board changed after the move
+        }
+
+        //Regarde si la valeur est de 0
+        static bool AjoutNombrePossible()
+        {
+            for (int row = 0; row < table.GetLength(0); row++)
+            {
+                for (int col = 0; col < table.GetLength(1); col++)
+                {
+                    if (table[row, col] == 0)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
-        //Créer un nombre aléatoire et selectionne une tuile aléatoire
-        static void NombreAleatoire()
-        {
-            //Creation de nombre aléatoire
-            Random random = new Random();
-            //Nombre aléatoire pour la rangé du tableau donc de 0 à 4
-            int randomLine = random.Next(0, 4);
-            int randomLine2 = random.Next(0, 4);
-
-            //Nombre aléatoire qui s'affichera dans la console de 0 à 9
-            int randomNumber2 = (random.Next(10) == 0) ? 4 : 1024;
-
-            do
-            {
-                //Nombre aléatoire pour la rangée du tableau donc de 0 à 4
-                randomLine = random.Next(0, 4);
-                randomLine2 = random.Next(0, 4);
-            } while (table[randomLine, randomLine2] != 0);
 
 
-            //Remplace une valeur dans le tableau aléatoirement en y mettant un nombre aléatoire entre 0 et 9
-            table[randomLine, randomLine2] = randomNumber2;
-        }
-        //affiche le tableau ainsi que les nombres aléatoire
-        static void AfficheTable()
-        {
-            //Clear la Console pour ne pas que l'affichage se repete
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.White;
-
-            //Si la tuile random est 0 alors il ajoute un 2 ou un 4
-            if (checkValues())
-            {
-                NombreAleatoire();
-                AfficheTableau();
-
-            }
-            //S'il n'y a plus de 0 disponnible, un message s'affiche
-            else
-            {
-                //Affiche le tableau
-                AfficheTableau();
-
-                if (Defaite() == false)
-                {
-                    //Affiche le tableau
-                    AfficheTableau();
-                    //Affiche un message quand la personne perd
-                    Console.WriteLine("\nFin de la partie.\n\nTape C pour quitter.");
-                }
-            }
-
-            //Gerer la victoire
-            if (Index >= 1)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("\nTu as gagné, tu peux continuer à jouer !!!");
-                Index += 1;
-            }
-
-        }
-
-        //Gère la défaite
-        static bool Defaite()
-        {
-            bool defaite = true;
-
-            for (int i = 1; i < 4; i++)
-            {
-                for (int j = 1; j < 4; j++)
-                {
-                    if ((i - 1 >= 0 && table[i, j] == table[i - 1, j]) ||
-                        (i + 1 <= 3 && table[i, j] == table[i + 1, j]) ||
-                        (j - 1 >= 0 && table[i, j] == table[i, j - 1]) ||
-                        (j + 1 <= 3 && table[i, j] == table[i, j + 1]))
-                    {
-                        defaite = false;
-                    }
-                }
-            }
-
-            return defaite;
-        }
-
-        //Detecte la flêche selectionnée et quitte si l'utilisateur tape C
-        static void DetectionFleche()
-        {
-            bool arrow = true;
-
-            //Boucle permettant de rester dans la DetectionFleche jusqu'a ce que l'utilisateur tape C
-            while (arrow)
-            {
-                //Attent que l'utilisateur tape une flêche
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-                ConsoleKey key = keyInfo.Key;
-
-                //Fait un mouvement dans le tableau en fonction de la flêche choisi ou quitte le programme
-                switch (key)
-                {
-                    //Flêche du haut
-                    case ConsoleKey.UpArrow:
-                        MouvementHaut();
-                        FusionHaut();
-                        MouvementHaut();
-                        AfficheTable();
-                        break;
-
-                    //Flêche du bas
-                    case ConsoleKey.DownArrow:
-                        MouvementBas();
-                        FusionBas();
-                        MouvementBas();
-                        AfficheTable();
-                        break;
-
-                    //Flêche de gauche
-                    case ConsoleKey.LeftArrow:
-                        MouvementGauche();
-                        FusionGauche();
-                        MouvementGauche();
-                        AfficheTable();
-                        break;
-
-                    //Flêche de droite
-                    case ConsoleKey.RightArrow:
-                        MouvementDroite();
-                        FusionDroite();
-                        MouvementDroite();
-                        AfficheTable();
-                        break;
-
-                    //C quitte le programme
-                    case ConsoleKey.C:
-                        arrow = false;
-                        break;
-
-                    //Affiche un message d'erreur et demande d'appuyer sur une flêche
-                    default:
-                        Console.WriteLine("Veuillez taper une touche valide.");
-                        break;
-
-                }
-            }
-        }
-        //Mouvement fleche du haut
+        //Mouvement et fusion vers le haut
         static void MouvementHaut()
         {
-            int size = table.GetLength(0);
-
-            //Parcourir chaque colonne de gauche à droite
-            for (int y = 0; y < size; y++)
+            for (int col = 0; col < table.GetLength(1); col++)
             {
-                for (int x = 1; x < size; x++)
+                //Bouge les tuiles vers le haut
+                for (int row = 1; row < table.GetLength(0); row++)
                 {
-                    if (table[x, y] != 0)
+                    if (table[row, col] != 0)
                     {
-                        int row = x;
-
-                        //Déplace la tuile vers le haut
-                        while (row > 0 && table[row - 1, y] == 0)
+                        int currentRow = row;
+                        while (currentRow > 0 && table[currentRow - 1, col] == 0)
                         {
-                            table[row - 1, y] = table[row, y];
-                            table[row, y] = 0;
-                            row--;
+                            table[currentRow - 1, col] = table[currentRow, col];
+                            table[currentRow, col] = 0;
+                            currentRow--;
+                        }
+                    }
+                }
+
+                //Fusionne les tuiles identiques
+                for (int row = 1; row < table.GetLength(0); row++)
+                {
+                    if (table[row - 1, col] == table[row, col] && table[row, col] != 0)
+                    {
+                        table[row - 1, col] *= 2;
+                        score += table[row - 1, col];
+                        table[row, col] = 0;
+                    }
+                }
+
+                //Redéplace les tuiles vers le haut
+                for (int row = 1; row < table.GetLength(0); row++)
+                {
+                    if (table[row, col] != 0)
+                    {
+                        int currentRow = row;
+                        while (currentRow > 0 && table[currentRow - 1, col] == 0)
+                        {
+                            table[currentRow - 1, col] = table[currentRow, col];
+                            table[currentRow, col] = 0;
+                            currentRow--;
                         }
                     }
                 }
             }
         }
 
-        //Mouvement fleche du bas
+        //Mouvement et fusion vers le bas
         static void MouvementBas()
         {
-            int size = table.GetLength(0);
-
-            for (int y = 0; y < size; y++)
+            for (int col = 0; col < table.GetLength(1); col++)
             {
-                for (int x = size - 2; x >= 0; x--)
+                //Bouge les tuiles vers le bas
+                for (int row = table.GetLength(0) - 2; row >= 0; row--)
                 {
-                    if (table[x, y] != 0)
+                    if (table[row, col] != 0)
                     {
-                        int row = x;
-
-                        //Déplace la tuile vers le bas
-                        while (row < size - 1 && table[row + 1, y] == 0)
+                        int currentRow = row;
+                        while (currentRow < table.GetLength(0) - 1 && table[currentRow + 1, col] == 0)
                         {
-                            table[row + 1, y] = table[row, y];
-                            table[row, y] = 0;
-                            row++;
+                            table[currentRow + 1, col] = table[currentRow, col];
+                            table[currentRow, col] = 0;
+                            currentRow++;
+                        }
+                    }
+                }
+
+                //Fusionne les tuiles identiques
+                for (int row = table.GetLength(0) - 2; row >= 0; row--)
+                {
+                    if (table[row + 1, col] == table[row, col] && table[row, col] != 0)
+                    {
+                        table[row + 1, col] *= 2;
+                        score += table[row + 1, col];
+                        table[row, col] = 0;
+                        row--;
+                    }
+                }
+
+                //Redéplace les tuiles vers le bas
+                for (int row = table.GetLength(0) - 2; row >= 0; row--)
+                {
+                    if (table[row, col] != 0)
+                    {
+                        int currentRow = row;
+                        while (currentRow < table.GetLength(0) - 1 && table[currentRow + 1, col] == 0)
+                        {
+                            table[currentRow + 1, col] = table[currentRow, col];
+                            table[currentRow, col] = 0;
+                            currentRow++;
                         }
                     }
                 }
             }
         }
 
-        //Mouvement fleche de gauche
+        //Mouvement et fusion vers la gauche
         static void MouvementGauche()
         {
-            int size = table.GetLength(0);
-
-            for (int x = 0; x < size; x++)
+            for (int row = 0; row < table.GetLength(0); row++)
             {
-                for (int y = 1; y < size; y++)
+                //Bouge les tuiles vers la gauche
+                for (int col = 1; col < table.GetLength(1); col++)
                 {
-                    if (table[x, y] != 0)
+                    if (table[row, col] != 0)
                     {
-                        int col = y;
-
-                        //Déplace la tuile vers la gauche
-                        while (col > 0 && table[x, col - 1] == 0)
+                        int currentCol = col;
+                        while (currentCol > 0 && table[row, currentCol - 1] == 0)
                         {
-                            table[x, col - 1] = table[x, col];
-                            table[x, col] = 0;
-                            col--;
+                            table[row, currentCol - 1] = table[row, currentCol];
+                            table[row, currentCol] = 0;
+                            currentCol--;
+                        }
+                    }
+                }
+
+                //Fusionne les tuiles identiques
+                for (int col = 1; col < table.GetLength(1); col++)
+                {
+                    if (table[row, col - 1] == table[row, col] && table[row, col] != 0)
+                    {
+                        table[row, col - 1] *= 2;
+                        score += table[row, col - 1];
+                        table[row, col] = 0;
+                    }
+                }
+
+                //Redéplace les tuiles vers la gauche
+                for (int col = 1; col < table.GetLength(1); col++)
+                {
+                    if (table[row, col] != 0)
+                    {
+                        int currentCol = col;
+                        while (currentCol > 0 && table[row, currentCol - 1] == 0)
+                        {
+                            table[row, currentCol - 1] = table[row, currentCol];
+                            table[row, currentCol] = 0;
+                            currentCol--;
                         }
                     }
                 }
             }
         }
 
-        //Mouvement fleche de droite
+        //Mouvement et fusion vers la droite
         static void MouvementDroite()
         {
-            int size = table.GetLength(0);
-
-            for (int x = 0; x < size; x++)
+            for (int row = 0; row < table.GetLength(0); row++)
             {
-                for (int y = size - 2; y >= 0; y--)
+                //Bouge les tuiles vers la droite
+                for (int col = table.GetLength(1) - 2; col >= 0; col--)
                 {
-                    if (table[x, y] != 0)
+                    if (table[row, col] != 0)
                     {
-                        int col = y;
-
-                        //Déplace la tuile vers la droite
-                        while (col < size - 1 && table[x, col + 1] == 0)
+                        int currentCol = col;
+                        while (currentCol < table.GetLength(1) - 1 && table[row, currentCol + 1] == 0)
                         {
-                            table[x, col + 1] = table[x, col];
-                            table[x, col] = 0;
-                            col++;
+                            table[row, currentCol + 1] = table[row, currentCol];
+                            table[row, currentCol] = 0;
+                            currentCol++;
+                        }
+                    }
+                }
+
+                //Fusionne les tuiles identiques
+                for (int col = table.GetLength(1) - 2; col >= 0; col--)
+                {
+                    if (table[row, col + 1] == table[row, col] && table[row, col] != 0)
+                    {
+                        table[row, col + 1] *= 2;
+                        score += table[row, col + 1];
+                        table[row, col] = 0;
+                    }
+                }
+
+                //Redéplace les tuiles vers la droite
+                for (int col = table.GetLength(1) - 2; col >= 0; col--)
+                {
+                    if (table[row, col] != 0)
+                    {
+                        int currentCol = col;
+                        while (currentCol < table.GetLength(1) - 1 && table[row, currentCol + 1] == 0)
+                        {
+                            table[row, currentCol + 1] = table[row, currentCol];
+                            table[row, currentCol] = 0;
+                            currentCol++;
                         }
                     }
                 }
             }
         }
 
-        //Fusion des tuiles vers le haut
-        static void FusionHaut()
+        //Verifie si le tableau est remplie et si des mouvements sont encores possible
+        static bool TableauRempli()
         {
-            int size = table.GetLength(0);
-
-            //Parcourir chaque colonne de gauche à droite
-            for (int y = 0; y < size; y++)
+            for (int row = 0; row < table.GetLength(0); row++)
             {
-                for (int x = 1; x < size; x++)
+                for (int col = 0; col < table.GetLength(1); col++)
                 {
-                    if (table[x, y] != 0)
-                    {
-                        int row = x;
+                    if (table[row, col] == 0)
+                        return true; //Trouve un 0 dans le tableau
 
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row > 0 && table[row - 1, y] == table[row, y])
-                        {
-                            table[row - 1, y] *= 2;
-                            table[row, y] = 0;
-                            score += table[row - 1, y];
+                    if (row < table.GetLength(0) - 1 && table[row, col] == table[row + 1, col])
+                        return true; //Mouvement Verticale possible
 
-                            //Gère une partie de la victoire
-                            if (table[row - 1, y] == 2048)
-                            {
-                                Index += 1;
-                            }
-                        }  
-                    }
-                }
-            }
-        }
-
-        //Fusion des tuiles vers le bas
-        static void FusionBas()
-        {
-            int size = table.GetLength(0);
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = size - 2; x >= 0; x--)
-                {
-                    if (table[x, y] != 0)
-                    {
-                        int row = x;
-                        
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (row < size - 1 && table[row + 1, y] == table[row, y])
-                        {
-                            table[row + 1, y] *= 2;
-                            table[row, y] = 0;
-                            score += table[row + 1, y];
-
-                            //Gère une partie de la victoire
-                            if (table[row + 1, y] == 2048)
-                            {
-                                Index += 1;
-                            }
-                        }
-                    }
+                    if (col < table.GetLength(1) - 1 && table[row, col] == table[row, col + 1])
+                        return true; //M ouvement Horizontale possible
                 }
             }
 
+            return false;
         }
 
-        //Fusion des tuiles vers la gauche
-        static void FusionGauche()
+        //Verifie la victoire
+        static bool Victoire()
         {
-            int size = table.GetLength(0);
-
-            for (int x = 0; x < size; x++)
+            for (int row = 0; row < table.GetLength(0); row++)
             {
-                for (int y = 1; y < size; y++)
+                for (int col = 0; col < table.GetLength(1); col++)
                 {
-                    if (table[x, y] != 0)
+                    if (table[row, col] >= 2048)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        //Verifie si le tableau est identique ou non
+        static bool ChangementTable(int[,] tableOriginal, int[,] tableCourante)
+        {
+            for (int row = 0; row < tableOriginal.GetLength(0); row++)
+            {
+                for (int col = 0; col < tableOriginal.GetLength(1); col++)
+                {
+                    if (tableOriginal[row, col] != tableCourante[row, col])
                     {
-                        int col = y;
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (col > 0 && table[x, col - 1] == table[x, col])
-                        {
-                            table[x, col - 1] *= 2;
-                            table[x, col] = 0;
-                            score += table[x, col - 1];
-
-                            //Gère une partie de la victoire
-                            if (table[x, col - y] == 2048)
-                            {
-                                Index += 1;
-                            }
-                        }
+                        return true;
                     }
                 }
             }
-
+            return false;
         }
 
-        //Fusion des tuiles vers la droite
-        static void FusionDroite()
-        {
-            int size = table.GetLength(0);
-
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = size - 2; y >= 0; y--)
-                {
-                    if (table[x, y] != 0)
-                    {
-                        int col = y;
-
-                        //Fusionne les tuiles si elles ont la même valeur
-                        if (col < size - 1 && table[x, col + 1] == table[x, col])
-                        {
-                            table[x, col + 1] *= 2;
-                            table[x, col] = 0;
-                            score += table[x, col + 1];
-
-                            //Gère une partie de la victoire
-                            if (table[x, col + 1] == 2048)
-                            {
-                                Index += 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        //Incrémentation du score
-        static int score = 0;
-
-        //Mettre des couleurs par nombre
-        static ConsoleColor CouleurTuiles(int value)
+        //Mettre des couleurs pour chaques cases
+        static void CouleurTuiles(int value)
         {
             switch (value)
             {
-                case 0:
-                    return ConsoleColor.DarkGray;
-                case 2:
-                    return ConsoleColor.Red;
-                case 4:
-                    return ConsoleColor.Blue;
-                case 8:
-                    return ConsoleColor.Yellow;
-                case 16:
-                    return ConsoleColor.Green;
-                case 32:
-                    return ConsoleColor.Cyan;
-                case 64:
-                    return ConsoleColor.Magenta;
-                case 128:
-                    return ConsoleColor.DarkRed;
-                case 256:
-                    return ConsoleColor.DarkBlue;
-                case 512:
-                    return ConsoleColor.DarkYellow;
-                case 1024:
-                    return ConsoleColor.DarkGreen;
-                case 2048:
-                    return ConsoleColor.DarkCyan;
-                default:
-                    return ConsoleColor.White; // Couleur par défaut
+                case 0: 
+                    Console.ForegroundColor = ConsoleColor.DarkGray; break;
+                case 2: 
+                    Console.ForegroundColor = ConsoleColor.Red; break;
+                case 4: 
+                    Console.ForegroundColor = ConsoleColor.Blue; break;
+                case 8: 
+                    Console.ForegroundColor = ConsoleColor.Yellow; break;
+                case 16: 
+                    Console.ForegroundColor = ConsoleColor.Green; break;
+                case 32: 
+                    Console.ForegroundColor = ConsoleColor.Cyan; break;
+                case 64: 
+                    Console.ForegroundColor = ConsoleColor.Magenta; break;
+                case 128: 
+                    Console.ForegroundColor = ConsoleColor.DarkRed; break;
+                case 256: 
+                    Console.ForegroundColor = ConsoleColor.DarkBlue; break;
+                case 512: 
+                    Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                case 1024: 
+                    Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                case 2048: 
+                    Console.ForegroundColor = ConsoleColor.DarkGray; break;
+                default: 
+                    Console.ForegroundColor = ConsoleColor.White; break; // Couleur par défaut
             }
         }
     }
